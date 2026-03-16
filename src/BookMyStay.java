@@ -1,6 +1,6 @@
 import java.util.HashMap;
 
-// Room class to store room details
+// Room class
 class Room {
     String type;
     int beds;
@@ -15,36 +15,49 @@ class Room {
     }
 }
 
-// RoomInventory class for centralized management
+// RoomInventory class (stores availability)
 class RoomInventory {
 
-    private HashMap<String, Integer> availability = new HashMap<>();
-    private HashMap<String, Room> rooms = new HashMap<>();
+    HashMap<String, Integer> availability = new HashMap<>();
+    HashMap<String, Room> rooms = new HashMap<>();
 
-    // Register a room type
+    // Register room type
     public void registerRoom(Room room, int count) {
         rooms.put(room.type, room);
         availability.put(room.type, count);
     }
+}
 
-    // Update room availability
-    public void updateAvailability(String type, int newCount) {
-        availability.put(type, newCount);
+// Search Service (read-only)
+class SearchService {
+
+    private RoomInventory inventory;
+
+    SearchService(RoomInventory inventory) {
+        this.inventory = inventory;
     }
 
-    // Display inventory
-    public void displayInventory() {
-        System.out.println("Hotel Room Inventory Status\n");
+    // Display available rooms only
+    public void searchAvailableRooms() {
 
-        for (String type : rooms.keySet()) {
-            Room r = rooms.get(type);
+        System.out.println("Room Search\n");
 
-            System.out.println(type + " Room:");
-            System.out.println("Beds: " + r.beds);
-            System.out.println("Size: " + r.size + " sqft");
-            System.out.println("Price per night: " + r.price);
-            System.out.println("Available Rooms: " + availability.get(type));
-            System.out.println();
+        for (String type : inventory.rooms.keySet()) {
+
+            int available = inventory.availability.get(type);
+
+            // Filter unavailable rooms
+            if (available > 0) {
+
+                Room r = inventory.rooms.get(type);
+
+                System.out.println(type + " Room:");
+                System.out.println("Beds: " + r.beds);
+                System.out.println("Size: " + r.size + " sqft");
+                System.out.println("Price per night: " + r.price);
+                System.out.println("Available: " + available);
+                System.out.println();
+            }
         }
     }
 }
@@ -57,12 +70,13 @@ public class BookMyStay {
         // Initialize inventory
         RoomInventory inventory = new RoomInventory();
 
-        // Register room types
+        // Register rooms
         inventory.registerRoom(new Room("Single", 1, 250, 1500.0), 5);
         inventory.registerRoom(new Room("Double", 2, 400, 2500.0), 3);
         inventory.registerRoom(new Room("Suite", 3, 750, 5000.0), 2);
 
-        // Display inventory
-        inventory.displayInventory();
+        // Guest searches for rooms
+        SearchService search = new SearchService(inventory);
+        search.searchAvailableRooms();
     }
 }
