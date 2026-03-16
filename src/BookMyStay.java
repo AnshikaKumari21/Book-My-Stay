@@ -1,69 +1,51 @@
-// Abstract Room class
-abstract class Room {
+import java.util.HashMap;
+
+// Room class to store room details
+class Room {
+    String type;
     int beds;
     int size;
     double price;
-    int available;
 
-    // Constructor
-    Room(int beds, int size, double price, int available) {
+    Room(String type, int beds, int size, double price) {
+        this.type = type;
         this.beds = beds;
         this.size = size;
         this.price = price;
-        this.available = available;
-    }
-
-    // Abstract method
-    abstract void display();
-}
-
-// Single Room class
-class SingleRoom extends Room {
-
-    SingleRoom(int beds, int size, double price, int available) {
-        super(beds, size, price, available);
-    }
-
-    void display() {
-        System.out.println("Single Room:");
-        System.out.println("Beds: " + beds);
-        System.out.println("Size: " + size + " sqft");
-        System.out.println("Price per night: " + price);
-        System.out.println("Available: " + available);
-        System.out.println();
     }
 }
 
-// Double Room class
-class DoubleRoom extends Room {
+// RoomInventory class for centralized management
+class RoomInventory {
 
-    DoubleRoom(int beds, int size, double price, int available) {
-        super(beds, size, price, available);
+    private HashMap<String, Integer> availability = new HashMap<>();
+    private HashMap<String, Room> rooms = new HashMap<>();
+
+    // Register a room type
+    public void registerRoom(Room room, int count) {
+        rooms.put(room.type, room);
+        availability.put(room.type, count);
     }
 
-    void display() {
-        System.out.println("Double Room:");
-        System.out.println("Beds: " + beds);
-        System.out.println("Size: " + size + " sqft");
-        System.out.println("Price per night: " + price);
-        System.out.println("Available: " + available);
-        System.out.println();
-    }
-}
-
-// Suite Room class
-class SuiteRoom extends Room {
-
-    SuiteRoom(int beds, int size, double price, int available) {
-        super(beds, size, price, available);
+    // Update room availability
+    public void updateAvailability(String type, int newCount) {
+        availability.put(type, newCount);
     }
 
-    void display() {
-        System.out.println("Suite Room:");
-        System.out.println("Beds: " + beds);
-        System.out.println("Size: " + size + " sqft");
-        System.out.println("Price per night: " + price);
-        System.out.println("Available: " + available);
+    // Display inventory
+    public void displayInventory() {
+        System.out.println("Hotel Room Inventory Status\n");
+
+        for (String type : rooms.keySet()) {
+            Room r = rooms.get(type);
+
+            System.out.println(type + " Room:");
+            System.out.println("Beds: " + r.beds);
+            System.out.println("Size: " + r.size + " sqft");
+            System.out.println("Price per night: " + r.price);
+            System.out.println("Available Rooms: " + availability.get(type));
+            System.out.println();
+        }
     }
 }
 
@@ -72,16 +54,15 @@ public class BookMyStay {
 
     public static void main(String[] args) {
 
-        System.out.println("Hotel Room Initialization\n");
+        // Initialize inventory
+        RoomInventory inventory = new RoomInventory();
 
-        // Creating room objects
-        SingleRoom single = new SingleRoom(1, 250, 1500.0, 5);
-        DoubleRoom doubleRoom = new DoubleRoom(2, 400, 2500.0, 3);
-        SuiteRoom suite = new SuiteRoom(3, 750, 5000.0, 2);
+        // Register room types
+        inventory.registerRoom(new Room("Single", 1, 250, 1500.0), 5);
+        inventory.registerRoom(new Room("Double", 2, 400, 2500.0), 3);
+        inventory.registerRoom(new Room("Suite", 3, 750, 5000.0), 2);
 
-        // Display room details
-        single.display();
-        doubleRoom.display();
-        suite.display();
+        // Display inventory
+        inventory.displayInventory();
     }
 }
